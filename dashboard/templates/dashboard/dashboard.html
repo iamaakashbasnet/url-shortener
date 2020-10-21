@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h1>Dashboard</h1>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a
+            class="nav-link active"
+            id="home-tab"
+            data-toggle="tab"
+            href="#home"
+            role="tab"
+            aria-controls="home"
+            aria-selected="true"
+        >Urls</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a
+            class="nav-link"
+            id="profile-tab"
+            data-toggle="tab"
+            href="#profile"
+            role="tab"
+            aria-controls="profile"
+            aria-selected="false"
+        >Add Urls</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a
+            class="nav-link"
+            id="contact-tab"
+            data-toggle="tab"
+            href="#contact"
+            role="tab"
+            aria-controls="contact"
+            aria-selected="false"
+        >Settings</a>
+    </li>
+</ul>
+
+<div class="tab-content container-fluid" id="myTabContent">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <h3 class="my-3">My Urls</h3>
+        <ul class="list-group">
+            {% if all_url %}
+                {% for url in all_url %}
+                    <li class="list-group-item">
+                        <p>Long Url: {{ url.url }}</p>
+                        <p>Short Url: <a href="http://localhost:8000/{{ url.short_url }}">{{ url.short_url }}</a></p>
+                        <button class="btn btn-light" data-clipboard-text="http://localhost:8000/{{ url.short_url }}">Copy to clipboard</button>
+                        <a class="btn btn-outline-danger mt-2 mt-md-0" href="{% url 'delete-url' url.pk %}">Delete</a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <p>Not added any url yet!</p>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <h3 class="my-3">Add Url</h3>
+        <form class="my-3" action="{% url 'create-url' %}" method='POST'>
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-outline-primary">Add</button>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+        <div class="d-flex align-items-center">
+            <h3 class="my-3 pr-3">Account Settings</h3>
+            <a href="{% url 'update-profile' %}" class="btn btn-outline-primary btn-sm">Edit</a>
+        </div>
+        <p>Name: {{ request.user.first_name }} {{ request.user.last_name }}</p>
+        <p>Username: {{ request.user.username }}</p>
+        <p>Email: {{ request.user.email }} </p>
+        <p>Total Urls: {{ total_url }}</p>
+    </div>
+</div>
+{% endblock content %}
